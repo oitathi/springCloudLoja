@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import com.example.springCloud.loja.client.FornecedorClient;
 import com.example.springCloud.loja.dto.CompraDto;
 import com.example.springCloud.loja.dto.InfoFornecedorDto;
+import com.example.springCloud.loja.dto.InfoPedidoDto;
+import com.example.springCloud.loja.model.Compra;
 
 
 
@@ -23,7 +25,7 @@ public class CompraService {
 	@Autowired
 	private FornecedorClient fornecedorClient; // com feign
 
-	public void realizaCompra(CompraDto compra) {
+	public Compra realizaCompra(CompraDto compra) {
 		
 		/* primeira forma: 
 		ResponseEntity<InfoFornecedorDto> exchange =   client.exchange("http://fornecedor/info/"+compra.getEndereco().getEstado(),
@@ -33,8 +35,14 @@ public class CompraService {
 		 */
 
 		// segunda forma: 
+		
+		
 		InfoFornecedorDto info = fornecedorClient.getInfoPorEstado(compra.getEndereco().getEstado());
-		System.out.println(info.getEndereco());
+		InfoPedidoDto pedido = fornecedorClient.realizaCompra(compra.getItens());
+		
+		Compra compraFeita = new Compra(pedido.getId(),pedido.getTempoDePreparo(),compra.getEndereco().toString());
+		return compraFeita;
+		
 	}
 
 }
